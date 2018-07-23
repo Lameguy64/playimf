@@ -1,0 +1,10 @@
+all: playimf.exe
+
+playimf.exe: main.obj player.obj
+	wlink n playimf f main f player sys dos
+	
+main.obj:
+	wcc /2 /ml /d2 main
+
+player.obj:
+	wasm /d1 /ml player
