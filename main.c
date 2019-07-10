@@ -10,6 +10,7 @@ extern void RemovePlayer();
 extern void PlayIMF(void* imfdata, int imflen);
 extern void StopIMF();
 extern int GetPosIMF();
+extern int GetLoopIMF();
 
 void *loadfile(const char* filename, long* length) {
 
@@ -47,20 +48,21 @@ void *loadfile(const char* filename, long* length) {
 
 int main(int argc, const char* argv[]) {
 	
-	int i,press,rate=280;
+	int i,press,rate=280,loop=-1;
 	const char* file = NULL;
 	void* imf;
 	long imflen;
 
 	// Little banner
 	printf("PLAYIMF - Very simple IMF music player\n");
-	printf("2018 Meido-Tek Productions (Lameguy64)\n\n");
+	printf("2018 - 2019 Meido-Tek Productions (Lameguy64)\n\n");
 	
 	if (argc == 1) {
 		printf("Usage:\n");
-		printf("   playimf [/r <rate>] <file>\n\n");
-		printf("   /r <rate> - Music rate in Hz (default: 280).\n");
-		printf("   <file>    - IMF file to play.\n");
+		printf("   playimf [/r <rate>] [/l <count>] <file>\n\n");
+		printf("   /r <rate>  - Music rate in Hz (default: 280).\n");
+		printf("   /l <count> - Loop <count> times.\n");
+		printf("   <file>     - IMF file to play.\n");
 		return 0;
 	}
 	
@@ -70,6 +72,13 @@ int main(int argc, const char* argv[]) {
 		if (strcasecmp("/r", argv[i]) == 0) {
 			i++;
 			rate = atoi(argv[i]);
+		} else if (strcasecmp("/l", argv[i]) == 0) {
+			i++;
+			loop = atoi(argv[i]);
+			if( loop <= 0 ) {
+				printf("Loop value must be greater than 0.\n");
+				return 0;
+			}
 		} else {
 			file = argv[i];
 			break;
@@ -100,16 +109,28 @@ int main(int argc, const char* argv[]) {
 	press = 0;
 	while(press != 'q') {
 		
-		press = getch();
-		
-		if (press == 's') {
-			StopIMF();
-			printf("Stopped.\n");
+		if( kbhit() ) {
+
+			press = getch();
+			
+			if (press == 's') {
+				StopIMF();
+				printf("Stopped.\n");
+			}
+			
+			if (press == 'p') {
+				PlayIMF(imf, (int)imflen);
+				printf("Playing.\n");
+			}
+			
 		}
 		
-		if (press == 'p') {
-			PlayIMF(imf, (int)imflen);
-			printf("Playing.\n");
+		if(loop > 0) {
+			
+			if( GetLoopIMF() >= loop ) {
+				break;
+			}
+			
 		}
 		
 	}

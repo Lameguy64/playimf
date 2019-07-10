@@ -32,6 +32,7 @@ IMFPROGS segment byte public 'CODE' use16
 	
 	imf_playing	db ?	; Playback status
 	imf_looping	db ?	; Looping status
+	imf_loop dw ?		; Loop count
 	
 	; InstallPlayer_
 	;
@@ -63,6 +64,7 @@ IMFPROGS segment byte public 'CODE' use16
 		mov		2[word ptr adl_cnt],ax
 		mov		imf_playing,al
 		mov		imf_looping,al
+		mov		imf_loop,ax
 		
         cli								; Install hook
         xor		ax,ax
@@ -158,6 +160,7 @@ IMFPROGS segment byte public 'CODE' use16
         
 		mov		imf_len,bx				; IMF data length
 		mov		imf_left,bx
+		mov		imf_loop,0
 		
         mov		0[word ptr imf_cnt],0	; Clear the counters
 		mov		2[word ptr imf_cnt],0
@@ -221,6 +224,14 @@ IMFPROGS segment byte public 'CODE' use16
 		mov		ax,imf_pos
 		ret
 	GetPosIMF_ endp
+	
+	
+	public GetLoopIMF_
+	GetLoopIMF_ proc
+		mov		ax,imf_loop
+		ret
+	GetLoopIMF_ endp
+	
 	
 	; adlOut
 	;
@@ -374,6 +385,8 @@ IMFPROGS segment byte public 'CODE' use16
 		mov		imf_left,ax
 		mov		ax,imf_off
 		mov		imf_pos,ax
+		
+		add		imf_loop,1				; Increment loop count
 		
 		mov		0[word ptr imf_cnt],0
 		mov		2[word ptr imf_cnt],0

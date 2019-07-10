@@ -3,8 +3,8 @@ all: playimf.exe
 playimf.exe: main.obj player.obj
 	wlink n playimf f main f player sys dos
 	
-main.obj:
+main.obj: main.c
 	wcc /2 /ml /d2 main
 
-player.obj:
+player.obj: player.asm
 	wasm /d1 /ml player
